@@ -1,0 +1,2054 @@
+{
+  "name": "MARCIA GOMES",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "n8nhmaia",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -464,
+        1968
+      ],
+      "id": "843edd87-8c85-445d-855c-9880aa082861",
+      "name": "Webhook",
+      "webhookId": "97f095e6-c44b-4ed8-9b69-2b7f36aaebb1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fb2c5841-b26c-4017-a6f1-92816134faee",
+                    "leftValue": "={{ $('Webhook').item.json.body.data.message.audioMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "aea38d02-510d-45da-8a37-197f64efa21e",
+                    "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation || $('Webhook').item.json.body.data.message.extendedTextMessage.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0e49d8b8-bc29-4b68-a716-ec990c0e545d",
+                    "leftValue": "={{ $('Webhook').item.json.body.data.message.imageMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        640,
+        1952
+      ],
+      "id": "7fe272c0-51ec-41e7-b25a-ad82feea1e0e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ${DEEPSEEK_API_KEY}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Hello!\"\n    }\n  ],\n  \"stream\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bc7b9416-994c-43c8-8924-ceb3bd891865",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook').item.json.body.apikey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.choices[0].message.content }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "630788f8-d2c1-4cdb-ac29-c9ef3c174c0d",
+      "name": "Evolution Perplexity1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('RETIRAR TAGS').item.json.resposta_limpa }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2096,
+        2000
+      ],
+      "id": "c8034439-7b29-45b0-a7d6-c820d8fa5dcc",
+      "name": "EVOLUTION|DEEPSEEK"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Abaixo está o histórico recente da conversa com este cliente.\\nLEIA COM ATENÇÃO para saber o que já foi perguntado e o que o cliente já respondeu.\\nNÃO PERGUNTE coisas que já estão no histórico.\\n\\n=== HISTÓRICO RECENTE ===\\n\" + $('HISTORICO|MENSAGEM3').item.json.historico_conversa + \"\\n=========================\\n\\nVocê é a assistente virtual da confeitaria Marcia Gomes. Atue como uma vendedora experiente: seja simpática, proativa e tente coletar os detalhes do pedido (data, sabor, tema) antes de passar para o humano.\\n\\nResponda em português de forma curta, cordial e profissional. Quando precisar pedir mais informações, pergunte apenas uma coisa por vez.\\n\\n=== TABELA DE PREÇOS ===\\n- Bolo 1 andar: R$ 100,00\\n- Bolo 2 andares: R$ 150,00\\n- Cupcake simples: R$ 6,00 unidade\\n- Cupcake gourmet: R$ 10,00 unidade\\n- Brigadeiro gourmet: R$ 3,50 unidade (mínimo 25)\\n- Brownie: R$ 8,00 unidade\\n- Torta gelada: R$ 55,00 por quilo\\n- Doces finos: R$ 4,50 unidade\\n\\n=== REGRAS DE CÁLCULO ===\\n- Use 0,12 quilo por pessoa.\\n- Se o cliente disser apenas pessoas, calcule e explique rapidamente.\\n\\n=== REGRA DE ETIQUETAGEM (SEGMENTAÇÃO) ===\\nSe o cliente demonstrar interesse claro em um tipo de evento, adicione a tag correspondente no final da resposta (invisível para o cliente):\\n- <tag>casamento</tag> (Noivados, bodas, casamento)\\n- <tag>infantil</tag> (Criança, mesversário, heróis, desenhos)\\n- <tag>aniversario</tag> (Aniversário adulto, festa surpresa)\\n- <tag>corporativo</tag> (Empresas, eventos)\\n\\n=== QUANDO CHAMAR HUMANO ===\\nUse a tag <humano>sim</humano> APENAS se:\\n1. O cliente quiser FECHAR o pedido ou PAGAR.\\n2. O pedido for muito complexo/personalizado (ex: pasta americana 3D, topo específico).\\n3. A entrega for em menos de 24h.\\n4. O cliente pedir algo fora do cardápio.\\n\\nNos outros casos (dúvidas, orçamentos simples), use <humano>nao</humano>.\\n\\nExemplo de resposta com tag:\\n'Que amor! Temos vários temas de heróis. É para menino ou menina? <tag>infantil</tag> <humano>nao</humano>'\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": $('Webhook').item.json.body.data.message.conversation || $('Webhook').item.json.body.data.message.extendedTextMessage.text\n    }\n  ],\n  \"stream\": false\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1232,
+        1968
+      ],
+      "id": "17573e85-9541-4570-ad75-0a6209c311fd",
+      "name": "DEEPSEEK"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "=Para esse pedido, vou te encaminhar para um atendente humano que poderá confirmar os detalhes. Só um instante! 😊\n"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2544,
+        1696
+      ],
+      "id": "5ad7e960-dd06-48c3-95ad-a939da1da7a2",
+      "name": "HUMANO"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "audio.ogg",
+          "mimeType": "audio/ogg"
+        }
+      },
+      "id": "35b5f3f4-08fa-4184-a838-59e910d6dc36",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ff392999-d538-4fdf-83d6-932872f9f938",
+              "name": "base64",
+              "value": "={{ $json.base64 }}",
+              "type": "string"
+            },
+            {
+              "id": "2fe53ba8-b94c-4073-aff9-4cb614cc7c8b",
+              "name": "Numero",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "8f5d2c00-7d43-483d-93db-8475f363ddcf",
+              "name": "instancia",
+              "value": "={{ $('Webhook').item.json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "1ad15678-4f72-4f32-827e-2e9b5447dd26",
+              "name": "api_key_evolution",
+              "value": "={{ $('Webhook').item.json.body.apikey }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "20f66489-899c-4c77-b7a8-641cf6ba487a",
+      "name": "Global",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/chat/getBase64FromMediaMessage/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $json.messages.records[0].key.id }}\"\n    }\n  },\n  \"convertToMp4\": false\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "911f4b4a-9d23-432e-a11f-1a02076fb748",
+      "name": "Puxar áudio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1232,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-4o-transcribe"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1888,
+        1488
+      ],
+      "id": "97814756-be6d-4163-9ed4-952c945a5eeb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Você é o assistente virtual da confeitaria Marcia Gomes. Responda em português de forma curta, cordial e profissional (máximo 3 a 4 linhas por resposta). Quando precisar pedir mais informações, pergunte apenas uma coisa por vez. Sempre que gerar um orçamento, explique a conta em até duas linhas e mostre o valor final.\\n\\nTabela de preços fixa:\\n- Bolo 1 andar: R$ 100,00\\n- Bolo 2 andares: R$ 150,00\\n- Cupcake simples: R$ 6,00 unidade\\n- Cupcake gourmet: R$ 10,00 unidade\\n- Brigadeiro gourmet: R$ 3,50 unidade (mínimo 25 unidades)\\n- Brownie: R$ 8,00 unidade\\n- Torta gelada: R$ 55,00 por quilo\\n- Doces finos: R$ 4,50 unidade\\n\\nRegras de cálculo para bolo:\\n- Use 0,12 quilo por pessoa.\\n- Se o cliente disser apenas pessoas ou quilos, calcule e explique rapidamente.\\n\\nConsidere o pedido complexo quando:\\n1. O bolo tiver mais de um andar.\\n2. Usar pasta americana.\\n3. Tiver topo personalizado.\\n4. A entrega for em menos de 24 horas.\\n5. O valor final ultrapassar R$ 800.\\n6. O produto não estiver na lista acima.\\n7. O pedido tiver muitos detalhes específicos de decoração.\\n\\nSe for complexo, finalize com <humano>sim</humano>.\\nSe for simples, finalize com <humano>nao</humano>.\\n\\nSobre produtos:\\n- Se perguntarem por bolos ou doces, liste até seis itens.\\n- Se pedirem sabores, ofereça quatro opções.\\n- Em orçamentos, pergunte apenas o que faltar: peso ou pessoas, data de entrega e tipo de decoração.\\n- Termine orçamentos com a frase Deseja confirmar a data e o sabor?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\":\"{{ $json.text }}\"\n    }\n  ],\n  \"stream\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2128,
+        1488
+      ],
+      "id": "5fa78202-ff56-4788-bbac-9df58ccbb79b",
+      "name": "DEEPSEEK1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Entrada do DeepSeek\nconst resposta = $input.item.json.choices[0].message.content || \"\";\n\n// Detecta se precisa de humano\nconst precisa = resposta.includes(\"<humano>sim</humano>\");\n\n// Remove as tags\nconst limpa = resposta.replace(/<humano>.*?<\\/humano>/gi, \"\").trim();\n\n// Retorna o objeto tratável no próximo node\nreturn {\n  resposta_limpa: limpa,\n  precisa_humano: precisa\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        1344
+      ],
+      "id": "5884c42c-7ec2-4040-84c2-5c653371b7b7",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "=Seu pedido tem detalhes importantes ❤️\nVou pedir para um atendente humano entrar e finalizar tudo com você."
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2848,
+        1344
+      ],
+      "id": "ee7571f7-ae13-4741-bc76-81991cdfe301",
+      "name": "HUMANO1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.resposta_limpa }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2848,
+        1504
+      ],
+      "id": "0dc76f09-54c8-4641-aa9e-68fb0ef39864",
+      "name": "EVOLUTION|DEEPSEEK1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Entrada do DeepSeek\nconst resposta = $input.item.json.choices[0].message.content || \"\";\n\n// Detecta se precisa de humano\nconst precisa = resposta.includes(\"<humano>sim</humano>\");\n\n// Remove as tags\nconst limpa = resposta.replace(/<humano>.*?<\\/humano>/gi, \"\").trim();\n\n// Retorna o objeto tratável no próximo node\nreturn {\n  resposta_limpa: limpa,\n  precisa_humano: precisa\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        1504
+      ],
+      "id": "4d34412a-0bbb-49fb-b659-34f0bc258f12",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"5585992501480\",\n  \"text\": \"🔔 Novo atendimento humano necessário!\\nCliente: {{ $('Webhook').item.json.body.data.key.remoteJid.replace('@s.whatsapp.net','').replace('@c.us','') }}\\nPor favor, entre em contato com ele para finalizar o pedido.\"\n}\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3056,
+        1344
+      ],
+      "id": "54fc8852-cab9-4889-8c6b-badd199a6fcf",
+      "name": "EVOLUTION|PRECISAHUMANO"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"5585992501480\",\n  \"text\": \"🔔 Novo atendimento humano necessário!\\nCliente: {{ $('Webhook').item.json.body.data.key.remoteJid.replace('@s.whatsapp.net','').replace('@c.us','') }}\\nPor favor, entre em contato com ele para finalizar o pedido.\"\n}\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2720,
+        1696
+      ],
+      "id": "97aee885-17f0-4e72-9afb-6d07dac6dd76",
+      "name": "EVOLUTION|PRECISAHUMANO1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2cae3a7-1a6a-4cd1-95a7-b7fa4fe4f4fb",
+              "leftValue": "={{ $('RETIRAR TAGS').item.json.precisa_humano }}",
+              "rightValue": "sim</humano>",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1824,
+        1984
+      ],
+      "id": "ad4686f3-ae1c-4b5b-8b33-e148a7c4f455",
+      "name": "HUMANO2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer SUA_DEEPSEEK_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Você é um assistente especializado em interpretar imagens de bolos, doces e confeitaria. Analise a imagem, entenda o pedido, descreva o que você vê e diga se é necessário falar com um humano.\\n\\nRegras:\\n- Seja detalhado e claro.\\n- Não invente nada.\\n- Finalize com:\\n  <humano>sim</humano> se o pedido for complexo.\\n  <humano>não</humano> se puder resolver sozinho.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Analise esta imagem e diga o que o cliente deseja.\"\n    },\n    {\n      \"role\": \"user\",\n      \"image_url\": \"={{ $json.body.data.message.imageMessage.url }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4192,
+        1072
+      ],
+      "id": "77a2cbc0-9108-4379-bd80-10269df07280",
+      "name": "DEEPSEEK2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json['0'].content[0].text }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2080,
+        2176
+      ],
+      "id": "2c47bf1f-4663-450d-80b6-08499816bb57",
+      "name": "EVOLUTION|DEEPSEEK3"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/chat/getBase64FromMediaMessage/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"key\": {\n      \"id\": \"{{ $json.messages.records[0].key.id }}\"\n    }\n  },\n  \"convertToMp4\": false\n} ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "38ef1d6f-0b7a-4b1b-a625-d6f764c1b538",
+      "name": "Puxar áudio1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        2176
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ff392999-d538-4fdf-83d6-932872f9f938",
+              "name": "base64",
+              "value": "={{ $json.base64 }}",
+              "type": "string"
+            },
+            {
+              "id": "2fe53ba8-b94c-4073-aff9-4cb614cc7c8b",
+              "name": "Numero",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "8f5d2c00-7d43-483d-93db-8475f363ddcf",
+              "name": "instancia",
+              "value": "={{ $('Webhook').item.json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "1ad15678-4f72-4f32-827e-2e9b5447dd26",
+              "name": "api_key_evolution",
+              "value": "={{ $('Webhook').item.json.body.apikey }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "021a954a-06af-48f4-89c3-bc47143a4ab1",
+      "name": "Global1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        2176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {}
+      },
+      "id": "5604e962-bb86-4c0e-a0e6-36d4e048bf7a",
+      "name": "Convert to File1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1616,
+        2176
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "id"
+        },
+        "text": "Você é a assistente virtual da Confeitaria Márcia Gomes. Sua tarefa é olhar a imagem enviada e descrever o que você vê de forma natural e simpática, como se estivesse confirmando o pedido com o cliente.\n\nDiretrizes:\n1. Descreva o bolo ou doce com carinho (mencione cores, tema, se tem andares, se parece delicioso).\n2. Se for uma foto de referência (inspiração), diga que entendeu o estilo.\n3. NÃO calcule preços nem invente valores (deixe isso para a próxima etapa).\n4. Se a imagem não for de comida (ex: foto aleatória, escuro, borrão), seja educada e diga que não entendeu.\n\nExemplos de tom de voz desejado:\n- \"Que lindo bolo de 2 andares com o tema da Patrulha Canina! A decoração em azul está ótima.\"\n- \"Recebi sua foto de referência. É um modelo com cobertura espatulada e flores, certo?\"\n- \"Ops, a imagem não carregou direito ou não parece ser um bolo. Pode conferir?\"",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        2176
+      ],
+      "id": "c46d6b2d-990d-4be6-9387-b3f123fbcdd2",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "avBSNOvWmzalfFXl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2cae3a7-1a6a-4cd1-95a7-b7fa4fe4f4fb",
+              "leftValue": "={{ $json.choices[0].message.content }}",
+              "rightValue": "sim</humano>",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2320,
+        1488
+      ],
+      "id": "4a3ef38c-e978-4294-8045-268f1d0748c4",
+      "name": "HUMANO3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution_evolution:8080/chat/findMessages/testechatbot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"where\": {\n    \"key\": {\n      \"remoteJid\": \"{{ $('Webhook').item.json.body.data.key.remoteJid }}\"\n    }\n  },\n  \"options\": {\n    \"limit\": 15,\n    \"sort\": \"DESC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        1968
+      ],
+      "id": "fa901e6b-eb24-4cd4-b02d-8172e27c95f3",
+      "name": "HISTORICO|MENSAGEM"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1bBLAgwPz89ytKnSSWq2u8BxBr48W4a1qIoZH40je7cA",
+          "mode": "list",
+          "cachedResultName": "Clientes Confeitaria",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bBLAgwPz89ytKnSSWq2u8BxBr48W4a1qIoZH40je7cA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bBLAgwPz89ytKnSSWq2u8BxBr48W4a1qIoZH40je7cA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Interesse": "={{ $json.etiqueta_detectada }}",
+            "Telefone": "={{ $json.telefone_cliente }}",
+            "Nome": "={{ $('Webhook').item.json.body.data.pushName }}",
+            "Data": "={{ $now.format('MM/DD HH:mm') }}"
+          },
+          "matchingColumns": [
+            "Telefone"
+          ],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interesse",
+              "displayName": "Interesse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        1632
+      ],
+      "id": "399c4471-f425-435d-9854-aae7af92d20d",
+      "name": "ADICIONAR CLIENTES",
+      "credentials": {
+        "googleApi": {
+          "id": "7ebiPW5ZekTRSFlW",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.server_url }}/message/sendText/{{ $('Webhook').item.json.body.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "="
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}"
+            },
+            {
+              "name": "text",
+              "value": "=Nesse momento nossa confeitaria está fechada (estamos descansando para preparar delícias amanhã! 😴🎂).\n\nMas pode ficar tranquilo(a): Já recebi sua mensagem e deixei anotada aqui. 📝\n\nAssim que iniciarmos o atendimento amanhã às 08h, um de nossos atendentes humanos vai te responder rapidinho para dar sequência, tá bom?\n\nTenha uma ótima noite!"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2608,
+        1872
+      ],
+      "id": "1d0c2dd2-c908-44c0-94d0-3f02afbd6025",
+      "name": "HUMANO|FORAHORARIO"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/{{ $json.payload[0].id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"humano\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3152,
+        1696
+      ],
+      "id": "9043c750-a65a-4959-bf33-8e212455c940",
+      "name": "ETIQUETA|HUMANO",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/{{ $json.payload[0].id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"labels\": [\"humano\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3472,
+        1344
+      ],
+      "id": "02e6ed8a-f676-438c-b7cf-037328e28162",
+      "name": "ETIQUETA|HUMANO1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/{{ $json.payload[0].id }}/labels/humano",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        2304
+      ],
+      "id": "b2d7631f-26c7-4cb2-9d63-0f2404636cb1",
+      "name": "DELETAR ETIQUETA| HUMANO",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5f126baf-7ffb-4004-989b-a93d3a918186",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        2240
+      ],
+      "id": "1560d8e6-4649-417f-8f41-c10b8fdbcac3",
+      "name": "FROM ME",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f784a989-6c21-4e26-bb99-d6ea7f760930",
+              "leftValue": "={{ $json.payload?.[0]?.labels || [] }}",
+              "rightValue": "humano",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        1952
+      ],
+      "id": "080b394f-7e42-45eb-9bee-22115ea75b6c",
+      "name": "VERIFICAR ETIQUETA| HUMANO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "48b942a6-a3b4-40a7-9bc4-5db09fefc41b",
+              "leftValue": "={{ parseInt($now.setZone('America/Sao_Paulo').format('H')) }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "2d2ecf60-6af4-4f1d-a978-5327abce3756",
+              "leftValue": "={{ parseInt($now.setZone('America/Sao_Paulo').format('H')) }}",
+              "rightValue": 23,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2304,
+        1728
+      ],
+      "id": "661d6813-c191-43b8-a1e6-62124b231d20",
+      "name": "HORARIO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "47163472-0a63-4890-9437-a23fef69f96f",
+              "leftValue": "={{ $json.body.data.message.conversation || $json.body.data.message.extendedTextMessage.text }}",
+              "rightValue": "Atendimento finalizado",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        2384
+      ],
+      "id": "4cf22fe3-83ca-4cf7-9917-6bca54780c5e",
+      "name": "CONDITION ATENDIMENTO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f11f374a-3d93-4e9a-b5ec-c659f975ba08",
+              "leftValue": "={{ $json.etiqueta_detectada }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        1968
+      ],
+      "id": "6bd4eaf3-f5e7-4c4d-800b-968710d27fc8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega dados do Webhook e do DeepSeek\nconst webhookData = $('Webhook').item.json.body.data;\nconst resposta = $input.item.json.choices?.[0]?.message?.content || \"\";\n\n// --- CAÇADOR DE NÚMERO REAL (O Sniper) ---\nconst key = webhookData.key;\n\n// 1. Lista de suspeitos onde o número pode estar\nconst candidatos = [\n    key.remoteJidAlt,  // Geralmente o correto quando é o dono\n    key.participant,   // Participante\n    key.remoteJid      // Padrão (onde as vezes vem o LID chato)\n];\n\n// 2. Filtro: Pega o primeiro que termina com '@s.whatsapp.net' (Número Real)\n// E ignora quem termina com '@lid' (Dispositivo)\nlet numeroReal = candidatos.find(num => num && num.includes('@s.whatsapp.net'));\n\n// 3. Se não achou nenhum número real, usa o remoteJid mesmo como última opção\nif (!numeroReal) {\n    numeroReal = key.remoteJid;\n}\n\n// 4. Limpa o sufixo\nconst telefoneLimpo = numeroReal ? numeroReal.replace(/@.*/, '') : \"Erro\";\n\n// --- RESTO DA LÓGICA ---\nconst precisa = resposta.toLowerCase().includes(\"<humano>sim</humano>\");\nconst matchEtiqueta = resposta.match(/<tag>(.*?)<\\/tag>/);\nconst etiqueta = matchEtiqueta ? matchEtiqueta[1] : null;\n\nconst limpa = resposta\n    .replace(/<humano>.*?<\\/humano>/gi, \"\")\n    .replace(/<tag>.*?<\\/tag>/gi, \"\")\n    .trim();\n\nreturn {\n  resposta_limpa: limpa,\n  precisa_humano: precisa,\n  etiqueta_detectada: etiqueta,\n  telefone_cliente: telefoneLimpo // O Sniper acertou aqui\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        1968
+      ],
+      "id": "4c022b41-9531-472e-9f56-f8b04b59cb04",
+      "name": "RETIRAR TAGS"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Entrada do DeepSeek\nconst resposta = $input.item.json.choices[0].message.content || \"\";\n\n// Detecta se precisa de humano\nconst precisa = resposta.includes(\"<humano>sim</humano>\");\n\n// Remove as tags\nconst limpa = resposta.replace(/<humano>.*?<\\/humano>/gi, \"\").trim();\n\n// Retorna o objeto tratável no próximo node\nreturn {\n  resposta_limpa: limpa,\n  precisa_humano: precisa\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3008,
+        2064
+      ],
+      "id": "97ae1264-dcb7-4e54-9a02-b80cae974ecc",
+      "name": "RETIRAR TAGS1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dados = $input.item.json;\n\n// 1. O RASTREADOR (Pega as mensagens onde estiverem)\nlet messages = [];\nif (dados.messages && dados.messages.records) messages = dados.messages.records;\nelse if (dados.data) messages = dados.data;\nelse if (Array.isArray(dados)) messages = dados;\n\n// 2. SEGURANÇA\nif (!messages || messages.length === 0) {\n    return { historico_conversa: \"Sem histórico anterior.\" };\n}\n\n// 3. RECUPERAR MEMÓRIA (Pega as últimas 15)\n// Estamos voltando para 15 para ele lembrar de tudo!\nconst ultimasMensagens = messages.slice(0, 15); \n\n// 4. FORMATAR E LIMPAR (O Segredo)\nlet lastSpeaker = \"\"; // Para detectar repetições\nlet historicoLimpo = [];\n\n// Inverte para ficar na ordem cronológica (Antigo -> Novo)\nconst mensagensCronologicas = ultimasMensagens.reverse();\n\nfor (const msg of mensagensCronologicas) {\n    const nome = msg.pushName || \"Cliente\";\n    const quem = msg.key.fromMe ? \"Atendente (IA)\" : nome;\n    \n    const texto = \n        msg.message?.conversation || \n        msg.message?.extendedTextMessage?.text || \n        msg.message?.imageMessage?.caption || \n        (msg.message?.imageMessage ? \"[FOTO do Cliente]\" : null) ||\n        (msg.message?.audioMessage ? \"[ÁUDIO do Cliente]\" : null) ||\n        \"\";\n\n    // FILTRO DE QUALIDADE:\n    // 1. Ignora mensagens vazias\n    // 2. Ignora se for exatamente igual à mensagem anterior (evita gagueira)\n    // 3. Ignora mensagens de sistema/erro\n    if (texto && texto !== \"\" && texto !== \"undefined\") {\n        \n        // Se a IA falou duas vezes seguidas a mesma coisa, ignora a segunda\n        // (Isso corrige o erro que aconteceu antes)\n        const mensagemAtual = `${quem}: ${texto}`;\n        if (historicoLimpo.length > 0 && historicoLimpo[historicoLimpo.length - 1] === mensagemAtual) {\n            continue; // Pula essa repetição\n        }\n\n        historicoLimpo.push(mensagemAtual);\n    }\n}\n\n// Junta tudo\nreturn { historico_conversa: historicoLimpo.join(\"\\n\") };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        1968
+      ],
+      "id": "5bcb9d2c-c397-4030-bfce-d273ea8efe1b",
+      "name": "HISTORICO|MENSAGEM3"
+    },
+    {
+      "parameters": {
+        "content": "NODES PARA SE TIVER QUE USAR DEPOIS\n",
+        "height": 288,
+        "width": 464,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2992,
+        2016
+      ],
+      "typeVersion": 1,
+      "id": "0dbb70f7-5df8-46d8-a00b-87d135e98332",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=+{{ $json.telefone_cliente }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1712,
+        1744
+      ],
+      "id": "7f8d5e18-4164-4299-b465-2f2b89462e93",
+      "name": "PROCURAR CONTATO|CHATWOOT3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution_evolution:8080/chat/findMessages/testechatbot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"where\": {\n    \"key\": {\n      \"remoteJid\": \"{{ $('Webhook').item.json.body.data.key.remoteJid }}\"\n    }\n  },\n  \"options\": {\n    \"limit\": 15,\n    \"sort\": \"DESC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        992,
+        2176
+      ],
+      "id": "3d94234d-0711-460b-86d4-296ca781ae9b",
+      "name": "HISTORICO|MENSAGEM2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution_evolution:8080/chat/findMessages/testechatbot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"where\": {\n    \"key\": {\n      \"remoteJid\": \"{{ $('Webhook').item.json.body.data.key.remoteJid }}\"\n    }\n  },\n  \"options\": {\n    \"limit\": 15,\n    \"sort\": \"DESC\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1008,
+        1488
+      ],
+      "id": "0f59c1e3-c8eb-4704-ae43-2c60c89b601d",
+      "name": "HISTORICO|MENSAGEM4"
+    },
+    {
+      "parameters": {
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('RETIRAR TAGS').item.json.telefone_cliente }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2928,
+        1696
+      ],
+      "id": "03b35c95-7bd5-4aad-8fcb-e9790688931c",
+      "name": "PROCURAR CONTATO|CHATWOOT4",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid.replace('@s.whatsapp.net', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3264,
+        1344
+      ],
+      "id": "7816f64c-03bb-482a-8872-84d978a46b51",
+      "name": "PROCURAR CONTATO|CHATWOOT5",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid.replace('@s.whatsapp.net', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        2304
+      ],
+      "id": "31fb5319-7d24-4cbf-9f91-2df29b58160a",
+      "name": "PROCURAR CONTATO|CHATWOOT",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/{{ $json.payload[0].id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  JSON.stringify({\n    labels: [ $('RETIRAR TAGS').item.json.etiqueta_detectada ]\n  })\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1872,
+        1744
+      ],
+      "id": "a48fd6c7-a4f0-4863-81ad-84db526a2ce5",
+      "name": "ETIQUETA TAG",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://chatwoot_chatwoot:3000/api/v1/accounts/2/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.body.data.key.remoteJid.replace('@s.whatsapp.net', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        1952
+      ],
+      "id": "19368d84-9c07-4c86-9e4c-015c28eaff17",
+      "name": "NUMERO|CHATWOOT",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "5oulcB8vMVVFUhES",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "NUMERO|CHATWOOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HISTORICO|MENSAGEM4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HISTORICO|MENSAGEM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HISTORICO|MENSAGEM2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEEPSEEK": {
+      "main": [
+        [
+          {
+            "node": "RETIRAR TAGS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HUMANO": {
+      "main": [
+        [
+          {
+            "node": "EVOLUTION|PRECISAHUMANO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Puxar áudio": {
+      "main": [
+        [
+          {
+            "node": "Global",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "DEEPSEEK1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DEEPSEEK1": {
+      "main": [
+        [
+          {
+            "node": "HUMANO3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HUMANO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HUMANO1": {
+      "main": [
+        [
+          {
+            "node": "EVOLUTION|PRECISAHUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "EVOLUTION|DEEPSEEK1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HUMANO2": {
+      "main": [
+        [
+          {
+            "node": "HORARIO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "EVOLUTION|DEEPSEEK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Puxar áudio1": {
+      "main": [
+        [
+          {
+            "node": "Global1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Global1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "EVOLUTION|DEEPSEEK3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HUMANO3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HISTORICO|MENSAGEM": {
+      "main": [
+        [
+          {
+            "node": "HISTORICO|MENSAGEM3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVOLUTION|PRECISAHUMANO": {
+      "main": [
+        [
+          {
+            "node": "PROCURAR CONTATO|CHATWOOT5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EVOLUTION|PRECISAHUMANO1": {
+      "main": [
+        [
+          {
+            "node": "PROCURAR CONTATO|CHATWOOT4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FROM ME": {
+      "main": [
+        [
+          {
+            "node": "NUMERO|CHATWOOT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CONDITION ATENDIMENTO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VERIFICAR ETIQUETA| HUMANO": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HORARIO": {
+      "main": [
+        [
+          {
+            "node": "HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HUMANO|FORAHORARIO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CONDITION ATENDIMENTO": {
+      "main": [
+        [
+          {
+            "node": "PROCURAR CONTATO|CHATWOOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RETIRAR TAGS": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ADICIONAR CLIENTES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HISTORICO|MENSAGEM3": {
+      "main": [
+        [
+          {
+            "node": "DEEPSEEK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "PROCURAR CONTATO|CHATWOOT3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HUMANO2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROCURAR CONTATO|CHATWOOT3": {
+      "main": [
+        [
+          {
+            "node": "ETIQUETA TAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HISTORICO|MENSAGEM2": {
+      "main": [
+        [
+          {
+            "node": "Puxar áudio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HISTORICO|MENSAGEM4": {
+      "main": [
+        [
+          {
+            "node": "Puxar áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROCURAR CONTATO|CHATWOOT4": {
+      "main": [
+        [
+          {
+            "node": "ETIQUETA|HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROCURAR CONTATO|CHATWOOT5": {
+      "main": [
+        [
+          {
+            "node": "ETIQUETA|HUMANO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PROCURAR CONTATO|CHATWOOT": {
+      "main": [
+        [
+          {
+            "node": "DELETAR ETIQUETA| HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ETIQUETA TAG": {
+      "main": [
+        [
+          {
+            "node": "HUMANO2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NUMERO|CHATWOOT": {
+      "main": [
+        [
+          {
+            "node": "VERIFICAR ETIQUETA| HUMANO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "aed06554-3c3e-4789-93e1-048be7aec452",
+  "meta": {
+    "instanceId": "09a9534db0c0d5dc6b24b8f602e3a52dd27d3492c38ce78c5e080a75e20d732d"
+  },
+  "id": "lUcLqEBzlKqDrGzCklhG9",
+  "tags": []
+}
